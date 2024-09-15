@@ -224,7 +224,7 @@ class Connection(Thread):
     def send_ping(self):
         self.logger.info("Connection: ping to pusher")
         try:
-            self.socket.send(json.dumps({'event': 'pusher:ping', 'data': ''}))
+            self.socket.send(json.dumps({'event': 'pusher:ping', 'data': None}))
         except Exception as e:
             self.logger.error("Failed send ping: %s" % e)
 

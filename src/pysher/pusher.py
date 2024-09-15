@@ -101,7 +101,7 @@ class Pusher(object):
         if auth is None:
             if channel_name.startswith('presence-'):
                 data['auth'] = self._generate_presence_token(channel_name)
-                data['channel_data'] = json.dumps(self.user_data)
+                data['channel_data'] = self.channel_data if hasattr(self, 'channel_data') else json.dumps(self.user_data)
             elif channel_name.startswith('private-'):
                 data['auth'] = self._generate_auth_token(channel_name)
         else:
@@ -202,13 +202,17 @@ class Pusher(object):
                 "socket_id": self.connection.socket_id,
                 "user_data": self.user_data,
             }
+            
             response = requests.post(
                 self.auth_endpoint,
-                data=request_data,
+                json=request_data,
                 headers=self.auth_endpoint_headers
             )
             assert response.status_code == 200, f"Failed to get auth token from {self.auth_endpoint}"
-            auth_key = response.json()["auth"]
+            response_data = response.json()
+            self.channel_data = response_data["channel_data"]
+            self.user_data = json.loads(response_data["channel_data"])
+            auth_key = response_data["auth"]
         return auth_key
 
     def _build_url(self, secure=True, port=None, custom_host=None):
