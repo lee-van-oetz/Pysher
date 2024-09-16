@@ -250,6 +250,7 @@ class Connection(Thread):
     def _connect_handler(self, data):
         parsed = json.loads(data)
         self.socket_id = parsed['socket_id']
+        self.ping_interval = int(parsed['activity_timeout']) if parsed['activity_timeout'] else self.ping_interval
         self.state = "connected"
 
         if self.needs_reconnect:
